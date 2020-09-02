@@ -14,6 +14,8 @@ source env/bin/activateç
 
 ## Install dependencies
 
+you should install all packages using PyPI and then
 ```
+pip freeze > requirements.txt
 pip3 install -r requirements.txt
 ```
