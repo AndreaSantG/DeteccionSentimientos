@@ -14,7 +14,7 @@ def get_files(emotion):
     files = glob.glob("dataset/%s/*" % emotion)
     random.shuffle(files)
     training = files[:int(len(files))]
-    prediction = ['dataset/2.png']  # aqui se añade la imagen que quieres procesar
+    prediction = ['inputs/2.png']  # aqui se añade la imagen que quieres procesar
     return training, prediction
 
 
