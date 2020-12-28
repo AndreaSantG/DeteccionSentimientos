@@ -1,8 +1,7 @@
-#source: https://unipython.com/deteccion-sentimientos-emociones-usando-marcas-faciales/
 import cv2, glob, random, math, numpy as np, dlib
 from sklearn.svm import SVC
 
-emotions = ["miedo", "feliz", "neutral", "tristeza", "enfado"]  # lista de sentimientos
+emotions = ["miedo", "feliz", "neutral", "tristeza"]  # lista de sentimientos
 clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")  # archivo de marcas faciales
@@ -11,12 +10,10 @@ clf = SVC(kernel='linear', probability=True,
 
 
 def get_files(emotion):
-    files = glob.glob("dataset/%s/*" % emotion)
+    files = glob.glob("dataset\\%s\\*" % emotion)
     random.shuffle(files)
     training = files[:int(len(files))]
-    prediction = ['inputs/cara9.png']  # aqui se añade la imagen que quieres procesar
-    #prediction = cv2.resize(prediction, (150, 150), interpolation=cv2.INTER_CUBIC)
-    #prediction = glob.glob("inputs/%s/*" % emotion)
+    prediction = ['dataset\\2.png']  # aqui se añade la imagen que quieres procesar
     return training, prediction
 
 
@@ -53,13 +50,7 @@ def get_landmarks(image):
             meannp = np.asarray((ymean, xmean))
             coornp = np.asarray((z, w))
             dist = np.linalg.norm(coornp - meannp)
-            try:
-                if(w == xmean):
-                    print('w - xmean 1 .......  '+str(w))
-                    print('w - xmean 2 .......  ' + str(xmean))
-                anglerelative = (math.atan((z - ymean) / (w - xmean)) * 180 / math.pi) - anglenose
-            except ZeroDivisionError as err:
-                print('Divided for zero', err)
+            anglerelative = (math.atan((z - ymean) / (w - xmean)) * 180 / math.pi) - anglenose
             landmarks_vectorised.append(dist)
             landmarks_vectorised.append(anglerelative)
 
@@ -103,10 +94,8 @@ def make_sets():
     return training_data, training_labels, prediction_data, prediction_labels,
 
 
-
-#Si quires añadir emociones modificar aquí
-probam1 = np.zeros((5, 10)) #Return a new array of given shape and type, filled with zeros.
-probam2 = np.zeros((1, 5))
+probam1 = np.zeros((4, 10))
+probam2 = np.zeros((1, 4))
 
 accur_lin = []
 
@@ -135,12 +124,11 @@ p1 = round(proba[0, 0], 2)
 p2 = round(proba[0, 1], 2)
 p3 = round(proba[0, 2], 2)
 p4 = round(proba[0, 3], 2)
-p5 = round(proba[0, 4], 2)
 print("Mean value lin svm: %.3f" % np.mean(accur_lin))  # hacemos 10 ejecuciones para aumentar precision
 
-frame = cv2.imread('inputs/cara9.png')  # aqui se añade la imagen que quieres procesar pero aqui solo se carga para el resultado final
+frame = cv2.imread(
+    'dataset\\2.png')  # aqui se añade la imagen que quieres procesar pero aqui solo se carga para el resultado final
 # ploteamos el resultado
-frame = cv2.resize(frame, (250, 250), interpolation=cv2.INTER_CUBIC)
 cv2.putText(frame, "Miedo: {}".format(p1), (10, 30),
             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 cv2.putText(frame, "Feliz: {:.2f}".format(p2), (10, 60),
@@ -149,11 +137,9 @@ cv2.putText(frame, "Neutral: {}".format(p3), (10, 90),
             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 cv2.putText(frame, "Triste: {:.2f}".format(p4), (10, 120),
             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-cv2.putText(frame, "Enfado: {}".format(p5), (10, 150),
-            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
 # mostramos la imagen
-cv2.imshow("Results", frame) #method is used to display an image in a window. The window automatically fits to the image size.
+cv2.imshow("Frame", frame)
 cv2.imwrite('resultado.png', frame)
 cv2.waitKey(0)
 cv2.destroyAllWindows()

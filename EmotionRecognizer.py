@@ -104,56 +104,60 @@ def make_sets():
 
 
 
-#Si quires añadir emociones modificar aquí
-probam1 = np.zeros((5, 10)) #Return a new array of given shape and type, filled with zeros.
-probam2 = np.zeros((1, 5))
+def emotion_recognizer(pathToFrame,frame):
+    # Si quires añadir emociones modificar aquí
+    probam1 = np.zeros((5, 10))  # Return a new array of given shape and type, filled with zeros.
+    probam2 = np.zeros((1, 5))
 
-accur_lin = []
+    accur_lin = []
 
-for i in range(0, 10):
-    print("Making sets %s" % i)  # hace un muestreo aleatorio 80/20%
-    training_data, training_labels, prediction_data, prediction_labels = make_sets()
+    for i in range(0, 10):
+        print("Making sets %s" % i)  # hace un muestreo aleatorio 80/20%
+        training_data, training_labels, prediction_data, prediction_labels = make_sets()
 
-    npar_train = np.array(training_data)  # gira el conjunto de entrenamiento en una matriz numpy para el clasificador
-    npar_trainlabs = np.array(training_labels)
-    print("training SVM linear %s" % i)  # entrenamiento SVM
-    clf.fit(npar_train, training_labels)
+        npar_train = np.array(
+            training_data)  # gira el conjunto de entrenamiento en una matriz numpy para el clasificador
+        npar_trainlabs = np.array(training_labels)
+        print("training SVM linear %s" % i)  # entrenamiento SVM
+        clf.fit(npar_train, training_labels)
 
-    print("getting accuracies %s" % i)  # Utilice la función score () para obtener mayor precisión
-    npar_pred = np.array(prediction_data)
-    pred_lin = clf.score(npar_pred, prediction_labels)
-    print("linear: ", pred_lin)
-    accur_lin.append(pred_lin)  # guarda la precision en una lista
-    proba = clf.predict_proba(prediction_data)
-    print("proba: ", proba)
-    probam1[:, i] = proba[1, :]
-    probam2 = proba[1, :] + probam2
-    # probam(:,i)=probam+proba
+        print("getting accuracies %s" % i)  # Utilice la función score () para obtener mayor precisión
+        npar_pred = np.array(prediction_data)
+        pred_lin = clf.score(npar_pred, prediction_labels)
+        print("linear: ", pred_lin)
+        accur_lin.append(pred_lin)  # guarda la precision en una lista
+        proba = clf.predict_proba(prediction_data)
+        print("proba: ", proba)
+        probam1[:, i] = proba[1, :]
+        probam2 = proba[1, :] + probam2
+        # probam(:,i)=probam+proba
 
-proba = probam2 / 10
-p1 = round(proba[0, 0], 2)
-p2 = round(proba[0, 1], 2)
-p3 = round(proba[0, 2], 2)
-p4 = round(proba[0, 3], 2)
-p5 = round(proba[0, 4], 2)
-print("Mean value lin svm: %.3f" % np.mean(accur_lin))  # hacemos 10 ejecuciones para aumentar precision
+    proba = probam2 / 10
+    p1 = round(proba[0, 0], 2)
+    p2 = round(proba[0, 1], 2)
+    p3 = round(proba[0, 2], 2)
+    p4 = round(proba[0, 3], 2)
+    p5 = round(proba[0, 4], 2)
+    print("Mean value lin svm: %.3f" % np.mean(accur_lin))  # hacemos 10 ejecuciones para aumentar precision
 
-frame = cv2.imread('inputs/cara9.png')  # aqui se añade la imagen que quieres procesar pero aqui solo se carga para el resultado final
-# ploteamos el resultado
-frame = cv2.resize(frame, (250, 250), interpolation=cv2.INTER_CUBIC)
-cv2.putText(frame, "Miedo: {}".format(p1), (10, 30),
-            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-cv2.putText(frame, "Feliz: {:.2f}".format(p2), (10, 60),
-            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-cv2.putText(frame, "Neutral: {}".format(p3), (10, 90),
-            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-cv2.putText(frame, "Triste: {:.2f}".format(p4), (10, 120),
-            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-cv2.putText(frame, "Enfado: {}".format(p5), (10, 150),
-            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+    frame = cv2.imread(frame)  # aqui se añade la imagen que quieres procesar pero aqui solo se carga para el resultado final
+    # ploteamos el resultado
+    frame = cv2.resize(frame, (250, 250), interpolation=cv2.INTER_CUBIC)
+    cv2.putText(frame, "Miedo: {}".format(p1), (10, 30),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+    cv2.putText(frame, "Feliz: {:.2f}".format(p2), (10, 60),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+    cv2.putText(frame, "Neutral: {}".format(p3), (10, 90),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+    cv2.putText(frame, "Triste: {:.2f}".format(p4), (10, 120),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+    cv2.putText(frame, "Enfado: {}".format(p5), (10, 150),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
-# mostramos la imagen
-cv2.imshow("Results", frame) #method is used to display an image in a window. The window automatically fits to the image size.
-cv2.imwrite('resultado.png', frame)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+    # mostramos la imagen
+    cv2.imshow("Results",
+               frame)  # method is used to display an image in a window. The window automatically fits to the image size.
+    #cv2.imwrite(frame + 'resultado.png', frame)
+    cv2.imwrite('resultado.png', frame)
+    #cv2.waitKey(0)
+    #cv2.destroyAllWindows()
